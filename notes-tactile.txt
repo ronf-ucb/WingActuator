@@ -1,0 +1,119 @@
+Bringing up tactile sensor on K64F
+July 10, 2019
+
+1. How to get pins screen to see package?
+right click on project name -> MCUXpresso config tools -> pins
+(can not click directly on pins tab- gives blank)
+
+2. What is maximum baud rate?
+64 x 4 char (3 digits + space) = 256 char * 200 Hz = 50kByte/sec = 400 kbaud
+K64F tech ref manual:52.4.2.9 Baud rate tolerance 
+MAx baud rate = UART clock /16
+https://mcuoneclipse.com/2014/06/14/frdm-k64f-atmaximum-speed-of-120-mhz/
+drivers/fsl_uart.h initializes to 115200
+
+https://mcuxpresso.nxp.com/apidoc/group__uart__driver.html
+
+Quick Settings -> SDK Debug Console
+PRINTF?
+Advanced settings: C/C++ Library Settings -> Redirect SDK PRINTF
+(not sure how this can be done once project is already installed)
+#define BOARD_DEBUG_UART_BAUDRATE 9600 
+and then use 
+UART_Init(UART0, &config, DEMO_UART_CLK_FREQ);
+(DEMO_UART_CLK_FREQ is defined in CLOCK_GetFreq(UART0_CLK_SRC)
+pyserial: Standard values above 115200, such as: 230400, 460800, 500000, 576000,
+921600, 1000000, 1152000, 1500000, 2000000, 2500000, 3000000, 3500000, 4000000
+ also work on many platforms and devices.
+ 
+ Changed BOARD_DEBUG_UART_BAUDRATE to 230400: ok.
+ 1152000 is garbled
+ 1000000 works ok on putty
+ 
+ 3. Analog input range:
+ VAIO Analog1, RESET, EXTAL, and XTAL input voltage –0.3 VDD + 0.3 V
+ 
+ 4. IO connections:
+ use J6 on K64F, 8 pin connections
+ 
+ 5. how to enable floating point and printing?
+ Quickstart -> Quick Settings -> Set Floating Point type
+ Hard ABI (pass floating point in registers)
+ 
+ 5.1  Quick Settings→Set Library Header type→NewlibNano (semihost)
+ 5.2  NewlibNano:   If  your  codebase  does  require  floating  point  variants  of printf/scanf, 
+ then these can be enabled by going to:
+ •Project→Properties→C/C++ Build→Settings→MCU Linker→Managed  Linker  Script 
+ and  selecting  the  ”Enable  printf/scanf float” tick box.
+ maybe also PRINTF_FLOAT_ENABLE=1?
+ CR_INTEGER_PRINTF - Undefine/Remove this directive
+ 
+ 6. Timing is off, are clocks set same as race-timer?
+ Maybe UART baudrate changed timing? Needed to change FreeRTOSConfig.h
+ 
+ 7. Using A/D in software triggered mode.
+ Ref manual p. 847, chap 35
+ Copy example from k64_adc
+ missing BOARD_INITPINS_ADC0_SE12_GPIO_PIN- need to set _Identifier_ in pin config tool!
+ (can not leave blank- then will not generate code.)
+ 
+ 8. How does getchar work? semiconsole or UART? 
+ use GETCHAR? Seems to hang in GETCHAR. need to debug reading a character.
+ PUTCHAR and GETCHAR work, but SCANF does not echo, and terminates on space, not <cr>
+ scanf went right to hardfault on single-step, maybe not linked in?
+ 
+ 9. can't see tactile_project when loading into mcuxpresso on haydn? Something with .cproject or .project?
+ These look identical. May need to just recreate project?
+ Or export as archive and reimport? But want to use github for compatability...
+ maybe .settings?
+  can't open project Tactile, but can open Tactile1?
+  try just copying an existing directory into its own location, w/o workspace?
+ worked ok for RaceTimer3. 
+ Tried copying tactile_project: Source Path Too Long: org.eclipse.egit.core.
+ Now opens ok, since this file was not copied. Is .metadata/.plugins/org.eclipse.core.resources/.projects needed?
+ Try deleting ./metadata directory.
+ 
+ 9. if project won't open, try deleting .metadata directory
+ 
+ 10. log task not running, since tactile_task is higher priority and did not yield.
+ /* configUSE_IDLE_HOOK must be set to 1 in FreeRTOSConfig.h for the idle hook function to get called. */
+ Log works after terminating getchar loop.
+ Task priorities: section 3.5 of Mastering FreeRTOS
+ zero is lowest priority==> log task should be higher priority than tactile reader task
+ 
+ 11. need non-blocking getchar, so it can yield to other processes.
+ DbgConsole_TryGetchar(&ch);
+ from fsl_debug_console.hang
+ add DEBUG_CONSOLE_TRANSFER_NON_BLOCKING=1
+ Properties -> C/C++ Build -> Settings -> MCU C compiler -> Preprocessor
+ 
+ 12. ADC Chan 12 works, how to use chan 6b?
+ try SDK example, chan 13 works, ADC13=J4-4 is ok,
+ #define DEMO_ADC16_BASE ADC1, to use ADC1_SE14=J4-6 and ADC1_SE15=J4-8
+ why is it _SE6b?
+ 
+ Try J4-10 which is ADC1_SE7b (pin 83) not working.
+ Mux select For A or B channels on SE4-7
+ kADC16_ChannelMuxB = 1U, /*!< For channel with channel mux b. */
+ need to add this initialization
+ void ADC16_SetChannelMuxMode(ADC_Type *base, adc16_channel_mux_mode_t mode)
+ adc16MuxStruct = kADC16_ChannelMuxB;
+    ADC16_SetChannelMuxMode(DEMO_ADC16_BASE, adc16MuxStruct);
+	
+13. Reading ScanClk- GPIO read interface?	
+ GPIO_PinRead(GPIO_Type *base, uint32_t pin)
+ 
+ 14. smartgit could not stage files. Had to make new repo to save them.
+ a) create new repo on github.com, save important files, clone on PC
+ b) create new MCUXpresso project in new repo directory area
+	i) OS-> freertos, driver -> adc, pit
+	ii) library NewlibNano semihost, use floating point version of printf, scanbf
+ c) copy source and modified files from repo directory to project by 
+    by copy paste in MCUXpresso project -> source and pin_mux to board.
+missing fsl_ftm.h, also need board.h, board.c, 
+need to set SDK_DEBUGCONSOLE=1
+also should save .cproject
+alled
+	
+ d) push to repo
+ 
