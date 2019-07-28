@@ -58,7 +58,8 @@ static void log_task(void *pvParameters)
     while (1)
     {   xQueueReceive(log_queue, log, portMAX_DELAY);
 //       PRINTF("Log %d: %s\r\n", counter, log);
-        PRINTF("Log %d: %s", counter, log);
+       // PRINTF("Log %d: %s", counter, log);
+    	PRINTF("%s", log);
         counter++;
         // maybe needs some yield in here?
     }

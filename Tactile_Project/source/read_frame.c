@@ -54,7 +54,7 @@ void read_frame()
     /* now print read array */
 	// use buffer to concatenate all values
 	// int snprintf ( char * s, size_t n, const char * format, ... );
-    PRINTF("Frame at %10.3f sec\n\r", frame_time);
+   // PRINTF("Frame at %10.3f sec\n\r", frame_time);
     for (j = 0; j < 8; j++)
     {     for(i= 0; i < 8; i++)
           {

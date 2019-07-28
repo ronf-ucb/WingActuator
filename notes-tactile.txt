@@ -126,3 +126,4 @@ Hangs on printf, should only use PRINTF.
 15. python interface: use ee192 telemetry framework?? 
 Probably overkill- just use pyserial and write to .csv file or display.
 install pyserial: use Anaconda prompt, then conda install pyserial
+https://pyserial.readthedocs.io/en/latest/shortintro.html
