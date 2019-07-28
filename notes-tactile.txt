@@ -45,7 +45,7 @@ pyserial: Standard values above 115200, such as: 230400, 460800, 500000, 576000,
  then these can be enabled by going to:
  •Project→Properties→C/C++ Build→Settings→MCU Linker→Managed  Linker  Script 
  and  selecting  the  ”Enable  printf/scanf float” tick box.
- maybe also PRINTF_FLOAT_ENABLE=1?
+  also C/C++ Build -> Settings->MCU C Compiler -> Preprocessor->PRINTF_FLOAT_ENABLE=1
  CR_INTEGER_PRINTF - Undefine/Remove this directive
  
  6. Timing is off, are clocks set same as race-timer?
@@ -113,7 +113,16 @@ pyserial: Standard values above 115200, such as: 230400, 460800, 500000, 576000,
 missing fsl_ftm.h, also need board.h, board.c, 
 need to set SDK_DEBUGCONSOLE=1
 also should save .cproject
-alled
-	
  d) push to repo
- 
+
+14. Release build gives error about dbgconsole
+had to set SDK_DEBUGCONSOLE=1 for release build.
+SDK_DEBUGCONSOLE_UART is set for racetimer3. Copy release .bin file to K: drive and reset.
+(Close terminal to avoid USB conflict)
+Release for Tactile doesn't run, just prints first 5 characters and stops.
+Stack limit? Or UART conflict with debugging? Maybe eliminate getchar?
+Hangs on printf, should only use PRINTF.
+
+15. python interface: use ee192 telemetry framework?? 
+Probably overkill- just use pyserial and write to .csv file or display.
+install pyserial: use Anaconda prompt, then conda install pyserial

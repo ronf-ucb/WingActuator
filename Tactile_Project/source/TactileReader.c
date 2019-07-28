@@ -239,7 +239,8 @@ int main(void)
     PRINTF("J6-5 for SensorOut ADC0_SE6b, J6-7 SyncOut PTD7, J6-6 ScanClk PTD6 \n\r");
 	// LED_GREEN_ON();
     PRINTF("Floating point PRINTF int:%4d float:%8.4f  double:%8.4f\n\r", (int) PI, pi_float, pi_double);
-    printf("Floating point printf %8.4f  %8.4lf\n\r", pi_float, pi_double); // only for semihost console, not release!
+    // printf crashes release???
+    //printf("Floating point printf %8.4f  %8.4lf\n\r", pi_float, pi_double); // only for semihost console, not release!
 
     /*PRINTF(" checking GETCHAR and PUTCHAR\n");
     while(1)
@@ -308,7 +309,7 @@ int main(void)
 
         PRINTF("Starting Scheduler\n\r");
 
-       LED_GREEN_OFF();
+       LED_GREEN_ON();  // to indicate program is running
     vTaskStartScheduler();
     /* should not get here */
 
