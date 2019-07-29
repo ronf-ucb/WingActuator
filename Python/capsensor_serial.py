@@ -13,6 +13,8 @@ import serial
 
 plt.close("all")   # try to close all open figs
 
+fig, ax = plt.subplots(1, 1)  # create just one plot
+
 offset_array = np.zeros((8,8))  # offset for unloaded sensor
 sensor_array = np.zeros((8,8))
 offset_flag = False
@@ -35,12 +37,15 @@ INTENSITY_MIN = 0
 
 
 def plot_array():
-    fig, ax = plt.subplots(1, 1)  # create just one plot
-    Z = np.random.rand(8, 8)
+    #Z = np.random.rand(8, 8)
+    global sensor_array
+    Z = sensor_array
     c = ax.pcolor(Z, cmap='Greys')
     ax.set_title('Cap sensor')
     fig.tight_layout()
     plt.show()
+    plt.show(block=False)  # this blocks on user input
+    plt.pause(0.1) 
     
     
 
@@ -100,7 +105,7 @@ def main():
     while True:
         print('>',)
        # keypress = msvcrt.getch()   
-        keypress = input()
+        keypress = input() # raw_input for python 2.7
         if keypress == '?':
             menu()
         elif keypress == 'o':
