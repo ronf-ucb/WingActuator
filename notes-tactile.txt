@@ -127,3 +127,12 @@ Hangs on printf, should only use PRINTF.
 Probably overkill- just use pyserial and write to .csv file or display.
 install pyserial: use Anaconda prompt, then conda install pyserial
 https://pyserial.readthedocs.io/en/latest/shortintro.html
+
+16. Python plotting: needed to change reader.next() to next(reader) and also to change csv file to text mode
+Spyder external plots Tools > Preferences > IPython console > Graphics > Graphics Backend
+
+17. grayscale plot works in example but not in capsensors_serial.py???
+Just hangs- something interferes?
+input() breaks?
+https://stackoverflow.com/questions/17149646/matplotlib-force-plot-display-and-then-return-to-main-code
+print("Note: Will not generate plot until exiting program. matplotlib bug")
