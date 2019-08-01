@@ -127,6 +127,7 @@ extern void read_frame(void);
 /* Application API */
 extern void write_task_1(void *pvParameters);
 extern void tactile_task(void *pvParameters);
+extern void frame_task(void *pvParameters);
 /* configUSE_IDLE_HOOK must be set to 1 in FreeRTOSConfig.h for the idle hook function to get called. */
 extern void vApplicationIdleHook( void );
 
@@ -171,7 +172,7 @@ void BOARD_SW_IRQ_HANDLER(void)
 }
 
 void PORTD_IRQHandler(void)
-{   /* Clear external interrupt flag. */
+{  /* Clear external interrupt flag. */
     GPIO_PortClearInterruptFlags(GPIOD, 1U << BOARD_INITPINS_SYNC_OUT_GPIO_PIN);
     NVIC_ClearPendingIRQ(PORTD_IRQn);
     DisableIRQ(PORTD_IRQn); // only one interrupt per car start, wait for back wheels, etc
@@ -181,9 +182,12 @@ void PORTD_IRQHandler(void)
 #if defined __CORTEX_M && (__CORTEX_M == 4U)
     __DSB();
 #endif
-	GPIO_PortClearInterruptFlags(GPIOD, 1U << BOARD_INITPINS_SYNC_OUT_GPIO_PIN);
-	NVIC_ClearPendingIRQ(PORTD_IRQn);
-	EnableIRQ(PORTD_IRQn); // only one interrupt per car start, wait for back wheels, etc
+}
+
+void enable_sync_interrupt(void)
+{  GPIO_PortClearInterruptFlags(GPIOD, 1U << BOARD_INITPINS_SYNC_OUT_GPIO_PIN);
+NVIC_ClearPendingIRQ(PORTD_IRQn);
+EnableIRQ(PORTD_IRQn); // allow next frame read
 }
 
 /*!
@@ -286,7 +290,11 @@ int main(void)
          while (1); // hang indefinitely
      }
 
-
+//    if (xTaskCreate(frame_task, "Frame_TASK", configMINIMAL_STACK_SIZE + 300, NULL, tskIDLE_PRIORITY + 4, NULL) !=
+//             pdPASS)
+//         {   PRINTF("Frame_task creation failed!.\r\n");
+//             while (1); // hang indefinitely
+//         }
 
     FTM_GetDefaultConfig(&ftmInfo);
     #if defined(FTM_PRESCALER_VALUE)

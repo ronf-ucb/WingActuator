@@ -69,9 +69,12 @@ void read_frame()
     LED_RED_OFF();
 }
 
-/* poll on ScanClk for rising edge */
+/* poll on ScanClk for rising edge, which is middle of cell */
 void wait_edge(void)
-{ }
+{
+	while(GPIO_PinRead(GPIOD, (uint32_t) 6) == 1); // wait for low
+	while(GPIO_PinRead(GPIOD, (uint32_t) 6) == 0); // wait for rising edge
+}
 
 
 // read PTD6, Scan_CLK

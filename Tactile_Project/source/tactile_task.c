@@ -47,6 +47,7 @@ void show_help(void);
 extern void analog_test();
 extern void read_frame(void);
 extern void read_scan_clk(void);
+extern void enable_sync_interrupt(void);
 
 /* Logger API */
 extern void log_add(char *log);
@@ -89,7 +90,11 @@ void tactile_task(void *pvParameters)
         	break;
 
         	case 'c': read_scan_clk();
-        	        	break;
+        	break;
+
+        	case 'r': enable_sync_interrupt(); // enable interrupt for one frame read
+        		LED_BLUE_TOGGLE();
+        	break;
 
        	    default: PUTCHAR('?');
        	    break;
@@ -108,7 +113,7 @@ void show_help()
 {
     PRINTF("\n?     show this message\r\n");
     PRINTF("a  read a/d channel 1               s  scan sensor\n\r");
-    PRINTF("c  read scan_clk\n\r");
+    PRINTF("c  read scan_clk                    r read once (interrupt)\n\r");
 }
 
 

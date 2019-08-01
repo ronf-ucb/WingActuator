@@ -20,7 +20,7 @@ sensor_array = np.zeros((8,8))
 offset_flag = False
 
 
-BS_COMPORT = 'COM3' # ron
+BS_COMPORT = 'COM4' # ron
 # BS_COMPORT = 'COM4' # usually com3 or com4 depending on computer
 # check Ports under device manager afetr plugging in K64F
 BS_BAUDRATE = 115200
@@ -53,19 +53,25 @@ def plot_array():
 def read_frame():
     temp_array = np.zeros((8,8))
     ser.reset_input_buffer() # discard if current content in buffer
-    ser.read_until('Fr',2)   # wait for first character of frame timing
+    ser.write(b'r') # send command to read frame
+    ser.flush()
+    #char = ser.read(1)
+    #while (char != b'F'):
+    #    char = ser.read(1)
+    #ser.read_until('Fr',2)   # wait for first character of frame timing
     first_line = ser.readline()
 #    print('First line',first_line)
     timestamp = float(first_line.split()[2]) # get time of sample
-    print('Time stamp',timestamp)
+    
     for i in range(0,8):
         line = ser.readline()
+        print(i,line)
         line_array = np.array(list(map(float, line.split())))
-  #     print(line,line_array)
         temp_array[i] = line_array
  #       pdb.set_trace() 
  #   print(sensor_array)
     ser.flush()  # clear out left over characters
+    print('Time stamp',timestamp)  # print at end so don't lose time
     return temp_array
  
 def menu():
