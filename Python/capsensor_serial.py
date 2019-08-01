@@ -40,10 +40,10 @@ def plot_array():
     #Z = np.random.rand(8, 8)
     global sensor_array
     Z = sensor_array
-    c = ax.pcolor(Z, cmap='Greys')
+    c = ax.pcolor(Z, cmap='Greys', vmin = -250, vmax = 50)
     ax.set_title('Cap sensor')
     fig.tight_layout()
-    plt.show()
+    # plt.show()
     plt.show(block=False)  # this blocks on user input
     plt.pause(0.1) 
     
@@ -55,6 +55,7 @@ def read_frame():
     ser.reset_input_buffer() # discard if current content in buffer
     ser.write(b'r') # send command to read frame
     ser.flush()
+    ser.read(3)  # throw out 'r\n*' from K64F
     #char = ser.read(1)
     #while (char != b'F'):
     #    char = ser.read(1)
@@ -81,7 +82,7 @@ def menu():
     
      
 def display_sensor():
-    global sensor_array
+    global sensor_array, offset_array 
     print('second read is array value')
     temp_array = read_frame()
     sensor_array = temp_array - offset_array
@@ -93,7 +94,7 @@ def display_sensor():
 
 
 def read_offset():
-    global offset_flag
+    global offset_flag, offset_array
     print('First read is offset')
     offset_array = read_frame()
     print('Offset array\n', offset_array)
