@@ -103,7 +103,7 @@ void tactile_task(void *pvParameters)
            PRINTF("QUIT\n");
 
     tick_now = xTaskGetTickCount();
-    sprintf(log, "Tactile Task done. tick_now %d\n\r",
+    sprintf(log, "Tactile Task done. tick_now %ld\n\r",
         		 (long)tick_now);
     log_add(log); // add message to print queue
     vTaskSuspend(NULL);

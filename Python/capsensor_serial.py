@@ -20,7 +20,7 @@ sensor_array = np.zeros((8,8))
 offset_flag = False
 
 
-BS_COMPORT = 'COM4' # ron
+BS_COMPORT = 'COM3' # ron
 # BS_COMPORT = 'COM4' # usually com3 or com4 depending on computer
 # check Ports under device manager afetr plugging in K64F
 BS_BAUDRATE = 115200
