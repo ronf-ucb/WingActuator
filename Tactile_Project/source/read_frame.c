@@ -40,7 +40,7 @@ void read_frame()
 	LED_RED_ON(); // reading frame
 
 	frame_time = (double)(xTaskGetTickCountFromISR()/10000.0); // with ticks at 100 us, convert to sec
-
+	wait_edge();  // first element is double length, so discard one scan clock period
 /* row is scanned first */
 /* 2/1/94:  input switches on falling edge, so sample on rising edge */
     for (j = 0; j < 8; j++)
